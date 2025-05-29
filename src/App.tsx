@@ -8,7 +8,7 @@ const App: React.FC = () => {
   const chat = useChat();
   return (
     <div className="relative flex flex-col h-screen overflow-hidden">
-      <VideoBackground src="/pitt-campus.mp4" />
+      <VideoBackground src="/pitt-campus-compressed.mp4" />
       <Header />
       <ChatContainer
         messages={chat.messages}
