@@ -1,6 +1,8 @@
 import React from "react";
 import BedrockLogo from "../assets/bedrock-color.svg";
 import { Message } from "../types";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface MessageBubbleProps {
   message: Message;
@@ -26,7 +28,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             : "bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-10 text-white ml-12"
         }`}
       >
-        <p className="text-sm leading-relaxed">{message.content}</p>
+        <div className="prose prose-invert text-sm leading-relaxed">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {message.content}
+          </ReactMarkdown>
+        </div>
         <span className="text-xs opacity-60 mt-2 block">
           {message.timestamp.toLocaleTimeString([], {
             hour: "numeric",
