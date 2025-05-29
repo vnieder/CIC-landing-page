@@ -1,0 +1,8 @@
+# Serve static assets first
+/*.mp4   /*.mp4   200
+/*.webm  /*.webm  200
+/*.jpg   /*.jpg   200
+/*.png   /*.png   200
+
+# Then handle React Router
+/*       /index.html   200
