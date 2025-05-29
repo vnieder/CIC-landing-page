@@ -8,6 +8,9 @@ import {
   LucideIcon,
 } from "lucide-react";
 import BedrockLogo from "./assets/bedrock-color.svg";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { getBotReply } from "./api";
 
 interface Message {
   id: number;
@@ -44,30 +47,39 @@ const App: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const simulateBotResponse = (userMessage: string): void => {
+  const simulateBotResponse = async (userMessage: string): Promise<void> => {
     setIsTyping(true);
-    setTimeout(() => {
-      const responses: string[] = [
-        "The AWS Cloud Innovation Center at Pitt focuses on collaborative research and education in cloud computing, AI, and emerging technologies. We work with students, faculty, and industry partners to drive innovation.",
-        "Our CIC offers hands-on learning experiences, industry partnerships, and access to cutting-edge AWS technologies. Students can work on real-world projects and gain valuable cloud computing skills.",
-        "The Cloud Innovation Center provides resources for research in areas like machine learning, data analytics, IoT, and serverless computing. We also offer workshops and training programs.",
-        "We collaborate with various departments across the university and external partners to tackle complex challenges using cloud technologies. Our goal is to prepare students for the future of technology.",
-      ];
 
-      const randomResponse: string =
-        responses[Math.floor(Math.random() * responses.length)];
+    try {
+      // Call the Bedrock API
+      const botReply = await getBotReply(userMessage);
 
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now(),
           type: "bot",
-          content: randomResponse,
+          content: botReply,
           timestamp: new Date(),
         },
       ]);
+    } catch (error) {
+      console.error("Error calling Bedrock API:", error);
+
+      // Fallback to a generic error message
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type: "bot",
+          content:
+            "I apologize, but I'm experiencing technical difficulties right now. Please try again in a moment.",
+          timestamp: new Date(),
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 1500 + Math.random() * 1000);
+    }
   };
 
   const sendMessage = (messageText: string): void => {
@@ -175,9 +187,12 @@ const App: React.FC = () => {
                           : "bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-10 text-white ml-12"
                       }`}
                     >
-                      <p className="text-sm leading-relaxed">
-                        {message.content}
-                      </p>
+                      <div className="prose prose-invert text-sm leading-relaxed">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
+
                       <span className="text-xs opacity-60 mt-2 block">
                         {message.timestamp.toLocaleTimeString([], {
                           hour: "numeric",
